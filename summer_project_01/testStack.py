@@ -1,7 +1,6 @@
 """
 Test stack data structure.
 file: testStack.py
-author: Sean Strout
 """
 
 from stack import *

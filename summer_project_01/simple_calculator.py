@@ -57,6 +57,21 @@ def stringToList(string):
         lst.append(x)
     return lst
 
+def operate(num,op):
+    num1 = int(top(num).number)
+    number = pop(num)
+    num2 = int(top(number).number)
+    number = pop(number)
+    opp = top(op)
+    op = pop(op)
+    result = int(calc(num1, num2, opp))
+
+    node = Number(str(result))
+    num = push(number, node)
+
+    return num, op
+
+
 """
 compute
 parameter - string
@@ -99,16 +114,10 @@ def simple_compute(equation):
         elif eList[0] == "+" or eList[0] == "-" or eList[0] == "*" or eList[0] == "/" or eList[0] == "^":
             if size(stackR["op"]) != 0:
                 while rank_checker(stackR["op"]) >= rank[eList[0]]:
-                    num1 = int(top(stackR["num"]).number)            #make it float later
-                    number = pop(stackR["num"])
-                    num2 = int(top(number).number)
-                    number = pop(number)
-                    op = top(stackR["op"])
-                    stackR["op"] = pop(stackR["op"])        # I feel like this part could be better.
-                    result = int(calc(num1, num2, op))
 
-                    node = Number(str(result))
-                    stackR["num"] = push(number, node)
+
+                    stackR["num"], stackR["op"] = operate(stackR["num"], stackR["op"])
+
                     if stackR["op"] == None:
                         break
 
@@ -124,32 +133,13 @@ def simple_compute(equation):
 
         elif eList[0] == ")":
             while top(stackR["op"]) != "(":
-                num1 = int(top(stackR["num"]).number)
-                number = pop(stackR["num"])
-                num2 = int(top(number).number)
-                number = pop(number)
-                op = top(stackR["op"])
-                stackR["op"] = pop(stackR["op"])
-                result = int(calc(num1, num2, op))
-
-                node = Number(str(result))
-                stackR["num"] = push(number, node)
+                stackR["num"], stackR["op"] = operate(stackR["num"], stackR["op"])
 
             stackR["op"] = pop(stackR["op"])
             eList.pop(0)
 
     while size(stackR["op"]) != 0:
-        num1 = int(top(stackR["num"]).number)
-        number = pop(stackR["num"])
-
-        num2 = int(top(number).number)
-        number = pop(number)
-        op = top(stackR["op"])
-        stackR["op"] = pop(stackR["op"])
-        result = int(calc(num1, num2, op))
-
-        node = Number(str(result))
-        stackR["num"] = push(number, node)
+        stackR["num"], stackR["op"] = operate(stackR["num"], stackR["op"])
 
     return int(top(stackR["num"]).number)
 
@@ -162,12 +152,13 @@ def test():
     e = '10^3'
     f = "2+5*(10-2)/4"
     g = "2+5*(10-2)/4"
-    print(simple_compute(a))
-    print(simple_compute(b))
-    print(simple_compute(c))
-    print(simple_compute(d))
-    print(simple_compute(e))
-    print(simple_compute(f))
+    print("Testing...")
+    print(simple_compute(a) == 412345678024)
+    print(simple_compute(b) == 5)
+    print(simple_compute(c) == 1)
+    print(simple_compute(d) == 35)
+    print(simple_compute(e) == 1000)
+    print(simple_compute(f) == 12)
     print(simple_compute(g) == 12)
 
 if __name__ == '__main__':

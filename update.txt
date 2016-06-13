@@ -1,3 +1,5 @@
 June 5, 2016
 Created a "operate" function that replaced repetitive code.
 
+June 13, 2016
+Fixed the simple_calculator.py so you don't need to import stack.

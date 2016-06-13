@@ -1,4 +1,3 @@
-from stack import *
 
 """
 For containing numbers with multiple digits. Only for integers
@@ -33,8 +32,7 @@ def calc(num1, num2,op):
 """
 order of operation
 """
-def rank_checker(operations):
-    op = top(operations)            # assumes that the operations parameter is a stack
+def rank_checker(op):       # op is operator
     if op == "+":
         return 1
     elif op == "-":
@@ -57,19 +55,22 @@ def stringToList(string):
         lst.append(x)
     return lst
 
-def operate(num,op):
-    num1 = int(top(num).number)
-    number = pop(num)
-    num2 = int(top(number).number)
-    number = pop(number)
-    opp = top(op)
-    op = pop(op)
+"""
+it takes two numbers and a op from each stack to do the math
+"""
+def operate(number,op):
+    num1 = int(number[-1].number)
+    number.pop()
+    num2 = int(number[-1].number)
+    number.pop()
+    opp = op[-1]
+    op.pop()
     result = int(calc(num1, num2, opp))
 
     node = Number(str(result))
-    num = push(number, node)
+    number.append(node)
 
-    return num, op
+    return number, op
 
 
 """
@@ -86,19 +87,15 @@ def simple_compute(equation):
     rank["/"] = 2
     rank["^"] = 3
     rank["("] = 0
-    stackR = {}
-    stackR["num"] = None                 # **Not sure if I really need to use dictionary to store stack
-    stackR["op"] = None
+    stackNumber = []                 # **Not sure if I really need to use dictionary to store stack
+    stackOP = []
     tempNum = ""                            # in string. used to hold the value after while loop. Same with others
                                             # I could change it to list but then I would have to make it so each append is a single string.
 
     eList = stringToList(equation)          # This is the equation in list form for each character.
 
     while 0 < len(eList):                   # designed so I can take account to multiple digits in numbers.
-        o = stackSting(stackR["op"])        #these two are there for debugging
-        n = stackSting2(stackR["num"])
-        #print("op: ", o)
-        #print("num: ", n)
+
 
         if eList[0].isdigit():
             temp = ""
@@ -109,39 +106,38 @@ def simple_compute(equation):
                 if eList == []:
                     break                   #That is why break is here
             node = Number(tempNum)
-            stackR["num"] = push(stackR["num"],node)
+            stackNumber.append(node)
 
         elif eList[0] == "+" or eList[0] == "-" or eList[0] == "*" or eList[0] == "/" or eList[0] == "^":
-            if size(stackR["op"]) != 0:
-                while rank_checker(stackR["op"]) >= rank[eList[0]]:
+            if len(stackOP) != 0:
+                while rank_checker(stackOP[-1]) >= rank[eList[0]]:
 
+                    stackNumber, stackOP = operate(stackNumber, stackOP)
 
-                    stackR["num"], stackR["op"] = operate(stackR["num"], stackR["op"])
-
-                    if stackR["op"] == None:
+                    if stackOP == []:
                         break
 
-                stackR["op"] = push(stackR["op"], eList[0])
+                stackOP.append(eList[0])
                 eList.pop(0)
             else:
-                stackR["op"] = push(stackR["op"], eList[0])
+                stackOP.append(eList[0])
                 eList.pop(0)
 
         elif eList[0] == "(":
-            stackR["op"] = push(stackR["op"], eList[0])
+            stackOP.append(eList[0])
             eList.pop(0)
 
         elif eList[0] == ")":
-            while top(stackR["op"]) != "(":
-                stackR["num"], stackR["op"] = operate(stackR["num"], stackR["op"])
+            while stackOP[-1] != "(":
+                stackNumber, stackOP = operate(stackNumber, stackOP)
 
-            stackR["op"] = pop(stackR["op"])
+            stackOP.pop()
             eList.pop(0)
 
-    while size(stackR["op"]) != 0:
-        stackR["num"], stackR["op"] = operate(stackR["num"], stackR["op"])
+    while len(stackOP) != 0:
+        stackNumber, stackOP = operate(stackNumber, stackOP)
 
-    return int(top(stackR["num"]).number)
+    return int(stackNumber[-1].number)
 
 
 def test():
